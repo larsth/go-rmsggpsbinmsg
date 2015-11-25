@@ -106,6 +106,14 @@ func (f *FixMode) String() string <span class="cov10" title="7">{
         <span class="cov1" title="1">return "Unknown FixMode value"</span> //make compiler happy
 }
 
+//MarshalJSON implements the json.Marshaler interface.
+//It marshals a valid FixMode value to the ASCII 8-bit/UTF-8 values:
+//"0", "1", "2", or "3".
+//If the FixMode is valid it returns that value in a 1-byte byte slice, and
+//a nil error.
+//
+//If the FixMode is not a valid FixMode value, then the
+//nil byte slice, and the ErrUnknownFixMode error are returned.
 func (f *FixMode) MarshalJSON() ([]byte, error) <span class="cov8" title="5">{
         var (
                 p = make([]byte, 1, 1)
@@ -127,6 +135,10 @@ func (f *FixMode) MarshalJSON() ([]byte, error) <span class="cov8" title="5">{
         <span class="cov1" title="1">return nil, ErrUnknownFixMode</span>
 }
 
+//UnmarshalJSON implements the json.Unmarshaler interface.
+//It unmarshals the ASCII 8-bit/UTF-8 values: "0", "1", "2", or "3" to a
+//FixMode value. If any other value than the above vlauea are met, then
+//UnmarshalJSON return the ErrUnknownFixMode, and sets the FixMode value to 253.
 func (f *FixMode) UnmarshalJSON(p []byte) error <span class="cov9" title="6">{
         if len(p) == 0 </span><span class="cov1" title="1">{
                 (*f) = FixMode(byte(252))
@@ -206,6 +218,8 @@ const (
 
 const gpsOctets = 13
 
+//Gps is type that contain a FixMode and the 32-bit floating point values:
+//Latitude, Longitude, and Altitude.
 type Gps struct {
         FixMode   FixMode `json:"fixmode"`
         Latitude  float32 `json:"latitude"`
@@ -213,26 +227,35 @@ type Gps struct {
         Altitude  float32 `json:"altitude"`
 }
 
+//Alt return a float64 representation of the Altitude.
 func (g *Gps) Alt() float64 <span class="cov8" title="1">{
         return float64(g.Altitude)
 }</span>
 
+//Lat return a float64 representation of the Latitude.
 func (g *Gps) Lat() float64 <span class="cov8" title="1">{
         return float64(g.Latitude)
 }</span>
 
+//Lon return a float64 representation of the Longitude.
 func (g *Gps) Lon() float64 <span class="cov8" title="1">{
         return float64(g.Longitude)
 }</span>
 
+//SetAlt sets the 32-bit floating point altitude value via a 64-bit floating
+//point value.
 func (g *Gps) SetAlt(v float64) <span class="cov8" title="1">{
         g.Altitude = float32(v)
 }</span>
 
+//SetLat sets the 32-bit floating point latitude value via a 64-bit floating
+//point value.
 func (g *Gps) SetLat(v float64) <span class="cov8" title="1">{
         g.Latitude = float32(v)
 }</span>
 
+//SetLon sets the 32-bit floating point longitude value via a 64-bit floating
+//point value.
 func (g *Gps) SetLon(v float64) <span class="cov8" title="1">{
         g.Longitude = float32(v)
 }</span>
@@ -309,11 +332,15 @@ const shaSize = sha256.Size224
 //returned from (*Payload).MarshalBinary() (data []byte, err error) has.
 const PayloadOctets = messageOctets + shaSize
 
+//Secrets is a type that contains the shared secrets, while a Payload had
+//been initialized.
 type Secrets struct {
         HMACKey []byte //shared HMAC secret key
         Salt    []byte //crypto.Rand generated garbage - lots of it, shared secret
 }
 
+//Payload is a type which is a representaion of the payload transmitted
+//between RMSG.dk programs.
 type Payload struct {
         mutex         sync.Mutex
         Secrets       Secrets
@@ -375,6 +402,10 @@ func checkHMAC(hmacKey, salt, messageOctets, hmacOctets []byte) (err error) <spa
         <span class="cov4" title="3">return nil</span>
 }
 
+//Init initializes a Payload type with the given 'hmacKey' and 'salt' slices.
+//Init does a simple zero length/nil check on both given slices, and one of
+//them has the zero length or is nil, then an error is reutned, if there are
+//no errors, then the nil error is returned.
 func (p *Payload) Init(hmacKey []byte, salt []byte) error <span class="cov10" title="14">{
         p.mutex.Lock()
         defer p.mutex.Unlock()
@@ -390,6 +421,9 @@ func (p *Payload) Init(hmacKey []byte, salt []byte) error <span class="cov10" ti
         return nil</span>
 }
 
+//New creates a new Payload with the given 'hmacKey' and 'salt' byte slices.
+//If ('Payload).Init(hmacKey, salt) returns an error, then a nil Payload and
+//the error are returned.
 func New(hmacKey []byte, salt []byte) (*Payload, error) <span class="cov7" title="7">{
         p := new(Payload)
         if err := p.Init(hmacKey, salt); err != nil </span><span class="cov3" title="2">{
@@ -398,6 +432,8 @@ func New(hmacKey []byte, salt []byte) (*Payload, error) <span class="cov7" title
         <span class="cov6" title="5">return p, nil</span>
 }
 
+//MarshalBinary marshals the data a payload type contains into a binary
+//representation of a Payload, which are stored in a byte slice.
 func (p *Payload) MarshalBinary() (data []byte, err error) <span class="cov5" title="4">{
         var v1, v2, v3, v4, v5, v6, v7, v8 byte
 
@@ -481,6 +517,8 @@ func (p *Payload) MarshalBinary() (data []byte, err error) <span class="cov5" ti
         return data, nil</span>
 }
 
+//UnmarshalBinary unmarshals a binary representation of a Payload in a byte
+//slice into the data a Payload type contains.
 func (p *Payload) UnmarshalBinary(data []byte) error <span class="cov5" title="4">{
         var (
                 f   float32
@@ -550,6 +588,8 @@ import (
 
 const timeStampOctets = 8
 
+//TimeStamp contains the timestamp, which is used to distinghish between an old 
+//message and a new message.
 type TimeStamp struct {
         Time time.Time
 }
@@ -561,6 +601,8 @@ func (t *TimeStamp) MarshalJSON() ([]byte, error) <span class="cov1" title="1">{
         return t.Time.MarshalJSON()
 }</span>
 
+//UnmarshalJSON implements the json.Unmarshaler interface. 
+//The time is expected to be a quoted string in RFC 3339 format. 
 func (t *TimeStamp) UnmarshalJSON(data []byte) error <span class="cov1" title="1">{
         return t.Time.UnmarshalJSON(data)
 }</span>

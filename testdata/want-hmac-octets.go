@@ -12,12 +12,15 @@ var wantBogusHmacOctetsSlice = []byte{
 	0x53, 0xe, 0x5a, 0xfb, 0x80, 0x53, 0x8, 0x5a,
 	0xc1, 0x35, 0xd, 0xc3}
 
+//WantHmacOctets returns a byte slice - used in TestCheckHMAC (test #5),
+//TestCreateHMAC2, and BenchmarkPayloadCheckHMAC.
 func WantHmacOctets() []byte {
 	s := make([]byte, 0, len(wantHmacOctetsSlice))
 	s = append(s, wantHmacOctetsSlice...)
 	return s
 }
 
+//WantBogusHmacOctets returns a byte slice
 func WantBogusHmacOctets() []byte {
 	s := make([]byte, 0, len(wantBogusHmacOctetsSlice))
 	s = append(s, wantBogusHmacOctetsSlice...)

@@ -1,5 +1,8 @@
 package testdata
 
+//Salt returns a 8 KB byte slice of crypto/rand generated random numbers.
+//Note: This is NOT a secret that had been shared by accident
+//(hint: It is testdata).
 func Salt() []byte {
 	s := make([]byte, 0, len(saltSlice))
 	s = append(s, saltSlice...)

@@ -11,6 +11,8 @@ var gpsSlice = []byte{
 	0x40, 0x00, 0xa3, 0xd7,
 }
 
+//GPS retuns a byte slice with the GPS POI:
+//FixMode: Fix3D, Latitude: 55.69147, Longitude: 12.61681, Altitude: 2.01
 func GPS() []byte {
 	s := make([]byte, 0, len(gpsSlice))
 	s = append(s, gpsSlice...)
@@ -26,12 +28,18 @@ var ts = []byte{
 	0x81, 0x62, 0xf2, 0xa9, 0x91, 0x2f, 0x7e, 0x00,
 }
 
+//TimeStamp returns a byte slice with a binary encoded time, which is relative
+//to the refence time which is "2305-01-01T00:00:00Z" (RFC3339 encoded string).
+//It is a 64-bit 2's complement big-endian encoded value of nanoseconds
+//relative to the reference time.
 func TimeStamp() []byte {
 	s := make([]byte, 0, len(ts))
 	s = append(s, ts...)
 	return s
 }
 
+//MessageOctets returns a byte slice, which contains GPS() immediately followed
+//by TimeStamp().
 func MessageOctets() []byte {
 	s := make([]byte, 0, 256)
 	s = append(s, gpsSlice...)
@@ -52,6 +60,8 @@ var bogusGpsSlice = []byte{
 	0x40, 0x00, 0xa3, 0xd7,
 }
 
+//BogusMessageOctets returns a byte slice, which contains BogusGPS() immediately
+// followed by TimeStamp().
 func BogusMessageOctets() []byte {
 	s := make([]byte, 0, 256)
 	s = append(s, bogusGpsSlice...)

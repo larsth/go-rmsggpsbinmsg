@@ -17,6 +17,14 @@ func (f *FixMode) String() string {
 	return "Unknown FixMode value" //make compiler happy
 }
 
+//MarshalJSON implements the json.Marshaler interface.
+//It marshals a valid FixMode value to the ASCII 8-bit/UTF-8 values:
+//"0", "1", "2", or "3".
+//If the FixMode is valid it returns that value in a 1-byte byte slice, and
+//a nil error.
+//
+//If the FixMode is not a valid FixMode value, then the
+//nil byte slice, and the ErrUnknownFixMode error are returned.
 func (f *FixMode) MarshalJSON() ([]byte, error) {
 	var (
 		p = make([]byte, 1, 1)
@@ -38,6 +46,10 @@ func (f *FixMode) MarshalJSON() ([]byte, error) {
 	return nil, ErrUnknownFixMode
 }
 
+//UnmarshalJSON implements the json.Unmarshaler interface.
+//It unmarshals the ASCII 8-bit/UTF-8 values: "0", "1", "2", or "3" to a
+//FixMode value. If any other value than the above vlauea are met, then
+//UnmarshalJSON return the ErrUnknownFixMode, and sets the FixMode value to 253.
 func (f *FixMode) UnmarshalJSON(p []byte) error {
 	if len(p) == 0 {
 		(*f) = FixMode(byte(252))

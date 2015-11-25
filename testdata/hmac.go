@@ -1,5 +1,8 @@
 package testdata
 
+//HmacKey returns 224 bits (28 bytes) of crypto/rand generated random numbers.
+//Note: This is NOT a secret that had been shared by accident
+//(hint: It is testdata).
 func HmacKey() []byte {
 	s := make([]byte, 0, len(hmacKeySlice))
 	s = append(s, hmacKeySlice...)

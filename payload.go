@@ -14,11 +14,15 @@ const shaSize = sha256.Size224
 //returned from (*Payload).MarshalBinary() (data []byte, err error) has.
 const PayloadOctets = messageOctets + shaSize
 
+//Secrets is a type that contains the shared secrets, while a Payload had
+//been initialized.
 type Secrets struct {
 	HMACKey []byte //shared HMAC secret key
 	Salt    []byte //crypto.Rand generated garbage - lots of it, shared secret
 }
 
+//Payload is a type which is a representaion of the payload transmitted
+//between RMSG.dk programs.
 type Payload struct {
 	mutex         sync.Mutex
 	Secrets       Secrets
@@ -80,6 +84,10 @@ func checkHMAC(hmacKey, salt, messageOctets, hmacOctets []byte) (err error) {
 	return nil
 }
 
+//Init initializes a Payload type with the given 'hmacKey' and 'salt' slices.
+//Init does a simple zero length/nil check on both given slices, and one of
+//them has the zero length or is nil, then an error is reutned, if there are
+//no errors, then the nil error is returned.
 func (p *Payload) Init(hmacKey []byte, salt []byte) error {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
@@ -95,6 +103,9 @@ func (p *Payload) Init(hmacKey []byte, salt []byte) error {
 	return nil
 }
 
+//New creates a new Payload with the given 'hmacKey' and 'salt' byte slices.
+//If ('Payload).Init(hmacKey, salt) returns an error, then a nil Payload and
+//the error are returned.
 func New(hmacKey []byte, salt []byte) (*Payload, error) {
 	p := new(Payload)
 	if err := p.Init(hmacKey, salt); err != nil {
@@ -103,6 +114,8 @@ func New(hmacKey []byte, salt []byte) (*Payload, error) {
 	return p, nil
 }
 
+//MarshalBinary marshals the data a payload type contains into a binary
+//representation of a Payload, which are stored in a byte slice.
 func (p *Payload) MarshalBinary() (data []byte, err error) {
 	var v1, v2, v3, v4, v5, v6, v7, v8 byte
 
@@ -186,6 +199,8 @@ func (p *Payload) MarshalBinary() (data []byte, err error) {
 	return data, nil
 }
 
+//UnmarshalBinary unmarshals a binary representation of a Payload in a byte
+//slice into the data a Payload type contains.
 func (p *Payload) UnmarshalBinary(data []byte) error {
 	var (
 		f   float32
