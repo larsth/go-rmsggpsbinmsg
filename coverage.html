@@ -1,0 +1,627 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/larsth/go-rmsggpsbinmsg/fixmode.go (100.0%)</option>
+				
+				<option value="file1">github.com/larsth/go-rmsggpsbinmsg/gps.go (100.0%)</option>
+				
+				<option value="file2">github.com/larsth/go-rmsggpsbinmsg/init.go (100.0%)</option>
+				
+				<option value="file3">github.com/larsth/go-rmsggpsbinmsg/misc.go (100.0%)</option>
+				
+				<option value="file4">github.com/larsth/go-rmsggpsbinmsg/payload.go (100.0%)</option>
+				
+				<option value="file5">github.com/larsth/go-rmsggpsbinmsg/timestamp.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">no coverage</span>
+				<span class="cov1">low coverage</span>
+				<span class="cov2">*</span>
+				<span class="cov3">*</span>
+				<span class="cov4">*</span>
+				<span class="cov5">*</span>
+				<span class="cov6">*</span>
+				<span class="cov7">*</span>
+				<span class="cov8">*</span>
+				<span class="cov9">*</span>
+				<span class="cov10">high coverage</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" >package binmsg
+
+//FixMode is a type used for indication no GPS fix, 2D GPS fix, and 3D GPS fix.
+type FixMode byte
+
+func (f *FixMode) String() string <span class="cov10" title="7">{
+        switch *f </span>{
+        <span class="cov1" title="1">case FixNotSeen:
+                return "Not Seen"</span>
+        <span class="cov1" title="1">case FixNone:
+                return "None"</span>
+        <span class="cov1" title="1">case Fix2D:
+                return "2D"</span>
+        <span class="cov6" title="3">case Fix3D:
+                return "3D"</span>
+        }
+        <span class="cov1" title="1">return "Unknown FixMode value"</span> //make compiler happy
+}
+
+func (f *FixMode) MarshalJSON() ([]byte, error) <span class="cov8" title="5">{
+        var (
+                p = make([]byte, 1, 1)
+        )
+        switch *f </span>{
+        <span class="cov1" title="1">case FixNotSeen:
+                p[0] = 0x30 //ASCII/UTF8: "0"
+                return p, nil</span>
+        <span class="cov1" title="1">case FixNone:
+                p[0] = 0x31 //ASCII/UTF8: "1"
+                return p, nil</span>
+        <span class="cov1" title="1">case Fix2D:
+                p[0] = 0x32 //ASCII/UTF8: "2"
+                return p, nil</span>
+        <span class="cov1" title="1">case Fix3D:
+                p[0] = 0x33 //ASCII/UTF8: "3"
+                return p, nil</span>
+        }
+        <span class="cov1" title="1">return nil, ErrUnknownFixMode</span>
+}
+
+func (f *FixMode) UnmarshalJSON(p []byte) error <span class="cov9" title="6">{
+        if len(p) == 0 </span><span class="cov1" title="1">{
+                (*f) = FixMode(byte(252))
+                return ErrNilSlice
+        }</span>
+        <span class="cov8" title="5">switch p[0] </span>{
+        <span class="cov1" title="1">case 0x30: //ASCII/UTF8: "0"
+                (*f) = FixNotSeen
+                return nil</span>
+        <span class="cov1" title="1">case 0x31: //ASCII/UTF8: "1"
+                (*f) = FixNone
+                return nil</span>
+        <span class="cov1" title="1">case 0x32: //ASCII/UTF8: "2"
+                (*f) = Fix2D
+                return nil</span>
+        <span class="cov1" title="1">case 0x33: //ASCII/UTF8: "3"
+                (*f) = Fix3D
+                return nil</span>
+        }
+        <span class="cov1" title="1">(*f) = FixMode(byte(253))
+        return ErrUnknownFixMode</span>
+}
+
+func (f *FixMode) marshalByte() (v byte, err error) <span class="cov10" title="7">{
+        err = nil
+        switch *f </span>{
+        <span class="cov1" title="1">case FixNotSeen:
+                v = 0
+                return v, nil</span>
+        <span class="cov1" title="1">case FixNone:
+                v = 1
+                return v, nil</span>
+        <span class="cov1" title="1">case Fix2D:
+                v = 2
+                return v, nil</span>
+        <span class="cov4" title="2">case Fix3D:
+                v = 3
+                return v, nil</span>
+        }
+        <span class="cov4" title="2">err = ErrUnknownFixMode
+        v = 255
+        return</span>
+}
+
+func (f *FixMode) unmarshalByte(data byte) error <span class="cov10" title="7">{
+        switch data </span>{
+        <span class="cov1" title="1">case 0:
+                (*f) = FixNotSeen
+                return nil</span>
+        <span class="cov1" title="1">case 1:
+                (*f) = FixNone
+                return nil</span>
+        <span class="cov1" title="1">case 2:
+                (*f) = Fix2D
+                return nil</span>
+        <span class="cov4" title="2">case 3:
+                (*f) = Fix3D
+                return nil</span>
+        }
+        <span class="cov4" title="2">(*f) = FixMode(byte(255))
+        return ErrUnknownFixMode</span>
+}
+
+const (
+        //FixNotSeen means that there is no knowledge of what kind of fix a GPS has.
+        FixNotSeen FixMode = 0
+        //FixNone means that the GPS hasn´t a fix.
+        FixNone FixMode = 1
+        //Fix2D means that the GPS has a 2D fix.
+        Fix2D FixMode = 2
+        //Fix3D means that the GPS has a 3D fix.
+        Fix3D FixMode = 3
+)
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package binmsg
+
+const gpsOctets = 13
+
+type Gps struct {
+        FixMode   FixMode `json:"fixmode"`
+        Latitude  float32 `json:"latitude"`
+        Longitude float32 `json:"longitude"`
+        Altitude  float32 `json:"altitude"`
+}
+
+func (g *Gps) Alt() float64 <span class="cov8" title="1">{
+        return float64(g.Altitude)
+}</span>
+
+func (g *Gps) Lat() float64 <span class="cov8" title="1">{
+        return float64(g.Latitude)
+}</span>
+
+func (g *Gps) Lon() float64 <span class="cov8" title="1">{
+        return float64(g.Longitude)
+}</span>
+
+func (g *Gps) SetAlt(v float64) <span class="cov8" title="1">{
+        g.Altitude = float32(v)
+}</span>
+
+func (g *Gps) SetLat(v float64) <span class="cov8" title="1">{
+        g.Latitude = float32(v)
+}</span>
+
+func (g *Gps) SetLon(v float64) <span class="cov8" title="1">{
+        g.Longitude = float32(v)
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package binmsg
+
+import (
+        "errors"
+        "strconv"
+        "time"
+)
+
+var referenceTime time.Time
+
+func init() <span class="cov1" title="1">{
+        _ = initBinMsg()
+}</span>
+
+func initBinMsg() error <span class="cov10" title="2">{
+        //Below:
+        //the error from time.Parse is igonored, because the the value string:
+        //"2305-01-01T00:00:00Z" and the layout string: time.RFC3339 does not
+        //trigger an error (the error is always nil) ...
+        referenceTime, _ = time.Parse(time.RFC3339, "2305-01-01T00:00:00Z")
+
+        referenceTime = referenceTime.UTC()
+
+        ErrPayloadSizeTooSmall = errors.New(
+                "The payload size is less than " + strconv.Itoa(PayloadOctets) +
+                        " bytes long.")
+        return nil
+}</span>
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package binmsg
+
+import (
+        "encoding/binary"
+        "math"
+)
+
+func float32MarshalBinary(f float32) (p []byte) <span class="cov10" title="5">{
+        p = make([]byte, 4)
+        u32 := math.Float32bits(f)
+        binary.BigEndian.PutUint32(p, u32)
+        return p
+}</span>
+
+func float32MarshalBinaryValues(f float32) (v1, v2, v3, v4 byte) <span class="cov8" title="4">{
+        p := float32MarshalBinary(f)
+        return p[0], p[1], p[2], p[3]
+}</span>
+
+func float32UnmarshalBinary(p []byte) float32 <span class="cov8" title="4">{
+        u32 := binary.BigEndian.Uint32(p)
+        return math.Float32frombits(u32)
+}</span>
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package binmsg
+
+import (
+        "crypto/hmac"
+        "crypto/sha256"
+        "hash"
+        "log"
+        "sync"
+)
+
+const shaSize = sha256.Size224
+
+//PayloadOctets is the amount of octets (bytes) the 'data' byte slice
+//returned from (*Payload).MarshalBinary() (data []byte, err error) has.
+const PayloadOctets = messageOctets + shaSize
+
+type Secrets struct {
+        HMACKey []byte //shared HMAC secret key
+        Salt    []byte //crypto.Rand generated garbage - lots of it, shared secret
+}
+
+type Payload struct {
+        mutex         sync.Mutex
+        Secrets       Secrets
+        Message       Message
+        MessageOctets []byte
+        HMACOctets    []byte
+}
+
+func createHMAC(hmacKey, salt, messageOctets []byte) (octets []byte, err error) <span class="cov9" title="13">{
+        var (
+                mac hash.Hash
+        )
+
+        octets = nil
+        if len(hmacKey) == 0 </span><span class="cov3" title="2">{
+                err = ErrNilHMACSecretKeySlice
+                return
+        }</span>
+        <span class="cov9" title="11">if len(salt) == 0 </span><span class="cov3" title="2">{
+                err = ErrNiSaltSlice
+                return
+        }</span>
+        <span class="cov8" title="9">if messageOctets == nil </span><span class="cov3" title="2">{
+                err = ErrNilMessageOctetsSlice
+                return
+        }</span>
+        <span class="cov7" title="7">err = nil
+
+        mac = hmac.New(sha256.New224, hmacKey)
+
+        mac.Write(hmacKey)
+        mac.Write(messageOctets)
+        mac.Write(salt)
+
+        octets = mac.Sum(nil)
+        return</span>
+}
+
+//checkHMAC reports whether p.HMACOctets is a valid HMAC tag for p.MessageOctets
+func checkHMAC(hmacKey, salt, messageOctets, hmacOctets []byte) (err error) <span class="cov8" title="9">{
+        var (
+                expectedMAC []byte
+                ok          bool
+        )
+
+        if len(hmacOctets) != shaSize </span><span class="cov1" title="1">{
+                err = ErrHMACOctetsWrongSize
+                ok = false
+                return
+        }</span>
+        <span class="cov8" title="8">if expectedMAC, err = createHMAC(hmacKey, salt, messageOctets); err != nil </span><span class="cov4" title="3">{
+                return err
+        }</span>
+
+        <span class="cov6" title="5">ok = hmac.Equal(hmacOctets, expectedMAC)
+        if ok == false </span><span class="cov3" title="2">{
+                return ErrHMACcheckFailed
+        }</span>
+        <span class="cov4" title="3">return nil</span>
+}
+
+func (p *Payload) Init(hmacKey []byte, salt []byte) error <span class="cov10" title="14">{
+        p.mutex.Lock()
+        defer p.mutex.Unlock()
+
+        if len(hmacKey) == 0 </span><span class="cov3" title="2">{
+                return ErrNilHMACSecretKeySlice
+        }</span>
+        <span class="cov9" title="12">if len(salt) == 0 </span><span class="cov3" title="2">{
+                return ErrNiSaltSlice
+        }</span>
+        <span class="cov8" title="10">p.Secrets.HMACKey = hmacKey
+        p.Secrets.Salt = salt
+        return nil</span>
+}
+
+func New(hmacKey []byte, salt []byte) (*Payload, error) <span class="cov7" title="7">{
+        p := new(Payload)
+        if err := p.Init(hmacKey, salt); err != nil </span><span class="cov3" title="2">{
+                return nil, err
+        }</span>
+        <span class="cov6" title="5">return p, nil</span>
+}
+
+func (p *Payload) MarshalBinary() (data []byte, err error) <span class="cov5" title="4">{
+        var v1, v2, v3, v4, v5, v6, v7, v8 byte
+
+        p.mutex.Lock()
+        defer p.mutex.Unlock()
+
+        p.MessageOctets = nil
+        data = nil
+        if len(p.Secrets.HMACKey) == 0 </span><span class="cov1" title="1">{
+                //HMAC secret is not set ...
+                err = ErrNilHMACSecretKeySlice
+                return
+        }</span>
+        <span class="cov4" title="3">if len(p.Secrets.Salt) == 0 </span><span class="cov1" title="1">{
+                //Salt (crypto random numbers) are not set ...
+                err = ErrNiSaltSlice
+                return
+        }</span>
+        <span class="cov3" title="2">p.MessageOctets = make([]byte, messageOctets, PayloadOctets)
+
+        //the message ...
+        //        1.0 Marshal The Gps structure to binary ...
+        //        1.1 Marshal the FixMode value
+        p.MessageOctets[0], err = p.Message.Gps.FixMode.marshalByte()
+        if err != nil </span><span class="cov1" title="1">{
+                return nil, err
+        }</span>
+        //Example FixMode value: Fix3D -&gt; 0x03
+        //
+        // 1.2 Marshal the Latitude IEEE 754 32-bit floating-point value
+        <span class="cov1" title="1">v1, v2, v3, v4 = float32MarshalBinaryValues(p.Message.Gps.Latitude)
+        //Example latitude: float32(55.69147) -&gt; v1=0x42, v2=0x5e, v3=0xc4, v4=0x11
+        p.MessageOctets[1] = v1
+        p.MessageOctets[2] = v2
+        p.MessageOctets[3] = v3
+        p.MessageOctets[4] = v4
+        // 1.3 Marshal the Longitude IEEE 754 32-bit floating-point value
+        v1, v2, v3, v4 = float32MarshalBinaryValues(p.Message.Gps.Longitude)
+        //Example longitude: float32(12.61681) -&gt; v1 = 0x41, v2=0x49, v3=0xde, v4=0x74
+        p.MessageOctets[5] = v1
+        p.MessageOctets[6] = v2
+        p.MessageOctets[7] = v3
+        p.MessageOctets[8] = v4
+        // 1.4 Marshal the Altitude IEEE 754 32-bit floating-point value
+        v1, v2, v3, v4 = float32MarshalBinaryValues(p.Message.Gps.Altitude)
+        //Example altitude: float32(2.01) -&gt; v1=0x40, v2=0x00, v3=0xa3, v4=0xd7
+        p.MessageOctets[9] = v1
+        p.MessageOctets[10] = v2
+        p.MessageOctets[11] = v3
+        p.MessageOctets[12] = v4
+        // 2.0 Marshal the TimeStamp
+        v1, v2, v3, v4, v5, v6, v7, v8 = p.Message.TimeStamp.marshalBytes()
+        //Example timestamp: "2015-11-21T08:41:55Z"
+        //        and reference time is "2305-01-01T00:00:00Z" -&gt;
+        //                 v1=0x81, v2=0x62, v3=0xf2, v4=0xa9,
+        //                 v5=0x91, v6=0x2f, v7=0x7e, v8=0x00
+        p.MessageOctets[13] = v1
+        p.MessageOctets[14] = v2
+        p.MessageOctets[15] = v3
+        p.MessageOctets[16] = v4
+        p.MessageOctets[17] = v5
+        p.MessageOctets[18] = v6
+        p.MessageOctets[19] = v7
+        p.MessageOctets[20] = v8
+
+        //hashsum ...
+        // 3.0 Create HMAC: 224-bits(=28 bytes) using the
+        // SHA2-256-224 hashsum algorithm ...
+        //The error from createHMAC is ignored, because the code in this
+        //method will make sure the error is always nil ...
+        p.HMACOctets, _ = createHMAC(p.Secrets.HMACKey, p.Secrets.Salt,
+                p.MessageOctets)
+
+        // 3.1 create the 'data' byte slice:
+        capacity := len(p.MessageOctets) + len(p.HMACOctets)
+        data = make([]byte, 0, capacity)
+        data = append(data, p.MessageOctets...)
+        data = append(data, p.HMACOctets...)
+
+        // 4.0 Done!
+        return data, nil</span>
+}
+
+func (p *Payload) UnmarshalBinary(data []byte) error <span class="cov5" title="4">{
+        var (
+                f   float32
+                err error
+                b   byte
+                s   []byte
+                //v1, v2, v3, v4 byte
+        )
+
+        p.mutex.Lock()
+        defer p.mutex.Unlock()
+
+        // 1.0 Data argument octet size check ...
+        if len(data) &lt; PayloadOctets </span><span class="cov1" title="1">{
+                log.Println(ErrPayloadSizeTooSmall)
+                return ErrPayloadSizeTooSmall
+        }</span>
+
+        // 2.0 Split the 'data' slice into the message slice and the hmac slice ...
+        <span class="cov4" title="3">p.MessageOctets = data[:messageOctets]
+        p.HMACOctets = data[messageOctets:]
+
+        //         3.0 HMAC checking ...
+        err = checkHMAC(p.Secrets.HMACKey, p.Secrets.Salt, p.MessageOctets,
+                p.HMACOctets)
+        if err != nil </span><span class="cov1" title="1">{
+                return err
+        }</span>
+
+        // 4.0 Unmarshal the payload ...
+
+        // 4.1.0 Unmarshal the GPS POI ...
+        // 4.1.1 Unmarshal the FixMode ...
+        <span class="cov3" title="2">b = p.MessageOctets[0]
+        if err = (&amp;p.Message.Gps.FixMode).unmarshalByte(b); err != nil </span><span class="cov1" title="1">{
+                return err
+        }</span>
+        // 4.1.2 Unmarshal the latitude ...
+        <span class="cov1" title="1">s = p.MessageOctets[1:5]
+        f = float32UnmarshalBinary(s)
+
+        p.Message.Gps.Latitude = f
+        // 4.1.2 Unmarshal the longitude ...
+        s = p.MessageOctets[5:9]
+        f = float32UnmarshalBinary(s)
+        p.Message.Gps.Longitude = f
+        // 4.1.2 Unmarshal the altitude ...
+        s = p.MessageOctets[9:13]
+        f = float32UnmarshalBinary(s)
+        p.Message.Gps.Altitude = f
+
+        // 4.2 Unmarshal the timestamp
+        s = p.MessageOctets[13:]
+        p.Message.TimeStamp.unmarshalBytes(
+                s[0], s[1], s[2], s[3], s[4], s[5], s[6], s[7])
+
+        return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package binmsg
+
+import (
+        "encoding/binary"
+        "time"
+)
+
+const timeStampOctets = 8
+
+type TimeStamp struct {
+        Time time.Time
+}
+
+//MarshalJSON implements the json.Marshaler interface.
+// The time is a quoted string in RFC 3339 format, with sub-second precision
+//added if present.
+func (t *TimeStamp) MarshalJSON() ([]byte, error) <span class="cov1" title="1">{
+        return t.Time.MarshalJSON()
+}</span>
+
+func (t *TimeStamp) UnmarshalJSON(data []byte) error <span class="cov1" title="1">{
+        return t.Time.UnmarshalJSON(data)
+}</span>
+
+func (t *TimeStamp) marshalBytes() (v1, v2, v3, v4, v5, v6, v7, v8 byte) <span class="cov10" title="2">{
+        var (
+                d   time.Duration
+                i64 int64
+                p   = make([]byte, 8)
+        )
+
+        d = t.Time.Sub(referenceTime)
+        i64 = int64(d)
+        binary.BigEndian.PutUint64(p, uint64(i64))
+
+        v1 = p[0]
+        v2 = p[1]
+        v3 = p[2]
+        v4 = p[3]
+        v5 = p[4]
+        v6 = p[5]
+        v7 = p[6]
+        v8 = p[7]
+        return
+}</span>
+
+func (t *TimeStamp) unmarshalBytes(v1, v2, v3, v4, v5, v6, v7, v8 byte) <span class="cov10" title="2">{
+        var (
+                p = make([]byte, 8)
+                i64 int64
+                d   time.Duration
+        )
+
+        p[0] = v1
+        p[1] = v2
+        p[2] = v3
+        p[3] = v4
+        p[4] = v5
+        p[5] = v6
+        p[6] = v7
+        p[7] = v8
+
+        i64 = int64(binary.BigEndian.Uint64(p))
+        d = time.Duration(i64)
+        t.Time = referenceTime.Add(d)
+}</span>
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible = document.getElementById('file0');
+		files.addEventListener('change', onChange, false);
+		function onChange() {
+			visible.style.display = 'none';
+			visible = document.getElementById(files.value);
+			visible.style.display = 'block';
+			window.scrollTo(0, 0);
+		}
+	})();
+	</script>
+</html>
