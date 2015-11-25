@@ -115,3 +115,48 @@ func TestGpsSetLon(t *testing.T) {
 		t.Fatal(s)
 	}
 }
+
+func BenchmarkGpsLat(b *testing.B) {
+	var g Gps
+	g.Latitude = 123.45
+	for i := 0; i < b.N; i++ {
+		_ = (&g).Lat()
+	}
+}
+
+func BenchmarkGpsLon(b *testing.B) {
+	var g Gps
+	g.Longitude = 123.45
+	for i := 0; i < b.N; i++ {
+		_ = (&g).Lon()
+	}
+}
+
+func BenchmarkGpsAlt(b *testing.B) {
+	var g Gps
+	g.Altitude = 123.45
+	for i := 0; i < b.N; i++ {
+		_ = (&g).Alt()
+	}
+}
+
+func BenchmarkGpsSetLat(b *testing.B) {
+	var g Gps
+	for i := 0; i < b.N; i++ {
+		(&g).SetLat(123.45)
+	}
+}
+
+func BenchmarkGpsSetLon(b *testing.B) {
+	var g Gps
+	for i := 0; i < b.N; i++ {
+		(&g).SetLon(123.45)
+	}
+}
+
+func BenchmarkGpsSetAlt(b *testing.B) {
+	var g Gps
+	for i := 0; i < b.N; i++ {
+		(&g).SetAlt(123.45)
+	}
+}

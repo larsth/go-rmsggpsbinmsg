@@ -208,3 +208,43 @@ func TestTimeStampUnmarshalBytes(t *testing.T) {
 		t.Fatal(mkIntErrString("Nanosecond", ts.Time.Nanosecond(), nanoseconds))
 	}
 }
+
+func BenchmarkTimeStampMarshalJSON(b *testing.B) {
+	var ts TimeStamp
+	ts.Time = time.Date(2015, 12, 11, 24, 31, 9, 0, time.UTC)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = ts.MarshalJSON()
+	}
+}
+
+func BenchmarkTimeStampUnmarshalJSON(b *testing.B) {
+	var ts TimeStamp
+	var data []byte
+	ts.Time = time.Date(2015, 12, 11, 24, 31, 9, 0, time.UTC)
+	data, _ = ts.MarshalJSON()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = ts.UnmarshalJSON(data)
+	}
+}
+
+func BenchmarkTimeStampMarshalBytes(b *testing.B) {
+	var ts TimeStamp
+	ts.Time = time.Date(2015, 12, 11, 24, 31, 9, 0, time.UTC)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _, _, _, _, _, _, _ = ts.marshalBytes()
+	}
+}
+
+func BenchmarkTimeStampUnmarshalBytes(b *testing.B) {
+	var ts TimeStamp
+	var v1, v2, v3, v4, v5, v6, v7, v8 byte
+	v1, v2, v3, v4 = 0x01, 0x23, 0x45, 0x67
+	v5, v6, v7, v8 = 0x89, 0xab, 0xcd, 0xef
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		ts.unmarshalBytes(v1, v2, v3, v4, v5, v6, v7, v8)
+	}
+}

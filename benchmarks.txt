@@ -1,7 +1,26 @@
 PASS
-BenchmarkFixModeString-2       	30000000	        42.3 ns/op
-BenchmarkFixModeMarshalJSON-2  	 3000000	       496 ns/op
-BenchmarkFixModeUnmarshalJSON-2	30000000	        49.4 ns/op
-BenchmarkFixModeMarshalByte-2  	30000000	        42.0 ns/op
-BenchmarkFixModeUnmarshalByte-2	50000000	        29.2 ns/op
-ok  	github.com/larsth/go-rmsggpsbinmsg	7.669s
+BenchmarkFixModeString-2                 	30000000	        42.2 ns/op
+BenchmarkFixModeMarshalJSON-2            	 3000000	       492 ns/op
+BenchmarkFixModeUnmarshalJSON-2          	30000000	        49.0 ns/op
+BenchmarkFixModeMarshalByte-2            	30000000	        42.1 ns/op
+BenchmarkFixModeUnmarshalByte-2          	50000000	        29.3 ns/op
+BenchmarkGpsLat-2                        	200000000	         8.53 ns/op
+BenchmarkGpsLon-2                        	200000000	         8.53 ns/op
+BenchmarkGpsAlt-2                        	200000000	         8.65 ns/op
+BenchmarkGpsSetLat-2                     	200000000	         7.91 ns/op
+BenchmarkGpsSetLon-2                     	200000000	         8.30 ns/op
+BenchmarkGpsSetAlt-2                     	200000000	         7.91 ns/op
+BenchmarkMiscFloat32MarshalBinary-2      	30000000	        46.5 ns/op
+BenchmarkMiscFloat32MarshalBinaryValues-2	20000000	        73.9 ns/op
+BenchmarkMiscFloat32UnmarshalBinary-2    	50000000	        28.5 ns/op
+BenchmarkPayloadCreateHMAC-2             	    5000	    258088 ns/op
+BenchmarkPayloadCheckHMAC-2              	    5000	    284966 ns/op
+BenchmarkPayloadInit-2                   	  100000	     21514 ns/op
+BenchmarkPayloadNew-2                    	  100000	     24621 ns/op
+BenchmarkPayloadMarshalBinary-2          	    5000	    240048 ns/op
+BenchmarkPayloadUnmarshalBinary-2        	 2000000	       841 ns/op
+BenchmarkTimeStampMarshalJSON-2          	  300000	      6025 ns/op
+BenchmarkTimeStampUnmarshalJSON-2        	  500000	      3691 ns/op
+BenchmarkTimeStampMarshalBytes-2         	 3000000	       609 ns/op
+BenchmarkTimeStampUnmarshalBytes-2       	 3000000	       378 ns/op
+ok  	github.com/larsth/go-rmsggpsbinmsg	46.744s

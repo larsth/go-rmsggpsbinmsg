@@ -37,3 +37,24 @@ func TestFloat32UnmarshalBinary(t *testing.T) {
 		t.Fatal(s)
 	}
 }
+
+func BenchmarkMiscFloat32MarshalBinary(b *testing.B) {
+	var f = float32(123.45)
+	for i := 0; i < b.N; i++ {
+		_ = float32MarshalBinary(f)
+	}
+}
+
+func BenchmarkMiscFloat32MarshalBinaryValues(b *testing.B) {
+	var f = float32(123.45)
+	for i := 0; i < b.N; i++ {
+		_, _, _, _ = float32MarshalBinaryValues(f)
+	}
+}
+
+func BenchmarkMiscFloat32UnmarshalBinary(b *testing.B) {
+	var p = []byte{0x01, 0x23, 0x45, 0x67}
+	for i := 0; i < b.N; i++ {
+		_ = float32UnmarshalBinary(p)
+	}
+}

@@ -478,3 +478,47 @@ func TestPayloadUnmarshalBinary3(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkPayloadCreateHMAC(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, _ = createHMAC(testdata.HmacKey(), testdata.Salt(),
+			testdata.MessageOctets())
+	}
+}
+
+func BenchmarkPayloadCheckHMAC(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = checkHMAC(testdata.HmacKey(), testdata.Salt(),
+			testdata.MessageOctets(), testdata.WantHmacOctets())
+	}
+}
+
+func BenchmarkPayloadInit(b *testing.B) {
+	var p = new(Payload)
+	for i := 0; i < b.N; i++ {
+		_ = p.Init(testdata.HmacKey(), testdata.Salt())
+	}
+}
+
+func BenchmarkPayloadNew(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, _ = New(testdata.HmacKey(), testdata.Salt())
+	}
+}
+
+func BenchmarkPayloadMarshalBinary(b *testing.B) {
+	var p = tFnCreatePayload()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = p.MarshalBinary()
+	}
+}
+
+func BenchmarkPayloadUnmarshalBinary(b *testing.B) {
+	var p = new(Payload)
+	var data = testdata.Data()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = p.UnmarshalBinary(data)
+	}
+}
