@@ -39,7 +39,7 @@ var tdFixModeStringWant = []*TtdTFixModeString{
 }
 
 func TestFixModeString(t *testing.T) {
-	var i int = 0
+	var i int // i = 0
 
 	log.SetOutput(ioutil.Discard)
 

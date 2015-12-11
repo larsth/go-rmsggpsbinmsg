@@ -75,7 +75,7 @@ func TestCreateHMAC1(t *testing.T) {
 func TestCreateHMAC2(t *testing.T) {
 	const i int = 3
 	var (
-		wantErr error = nil
+		wantErr error // = nil
 
 		//Got ...
 		gotHmacOctets []byte
@@ -356,8 +356,8 @@ func TestPayloadUnmarshalBinary0(t *testing.T) {
 	var (
 		wantErr = ErrPayloadSizeTooSmall
 		data    []byte
-		p           = new(Payload)
-		i       int = 0
+		p       = new(Payload)
+		i       int // = 0
 		gotErr  error
 		s       string
 		ok      bool
@@ -377,8 +377,8 @@ func TestPayloadUnmarshalBinary1(t *testing.T) {
 	var (
 		wantErr = ErrHMACcheckFailed
 		data    []byte
-		p           = new(Payload)
-		i       int = 0
+		p       = new(Payload)
+		i       int // = 0
 		gotErr  error
 		s       string
 		ok      bool
@@ -401,8 +401,8 @@ func TestPayloadUnmarshalBinary2(t *testing.T) {
 	var (
 		wantErr = ErrUnknownFixMode
 		data    []byte
-		p           = new(Payload)
-		i       int = 0
+		p       = new(Payload)
+		i       int // = 0
 		gotErr  error
 		s       string
 		ok      bool
@@ -420,10 +420,10 @@ func TestPayloadUnmarshalBinary2(t *testing.T) {
 
 func TestPayloadUnmarshalBinary3(t *testing.T) {
 	var (
-		wantErr        error = nil
+		wantErr        error // = nil
 		data           []byte
-		p                  = new(Payload)
-		i              int = 0
+		p              = new(Payload)
+		i              int // = 0
 		gotErr         error
 		s, sGot, sWant string
 		ok             bool

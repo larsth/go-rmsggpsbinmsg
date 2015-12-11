@@ -11,8 +11,8 @@ import (
 
 func TestInitBinMsg(t *testing.T) {
 	log.SetOutput(ioutil.Discard)
-	
-	var errString = "The payload size is less than " + 
+
+	var errString = "The payload size is less than " +
 		strconv.Itoa(PayloadOctets) +
 		" bytes long."
 	var tid, _ = time.Parse(time.RFC3339, "2305-01-01T00:00:00Z")

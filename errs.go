@@ -25,7 +25,7 @@ var (
 	//ErrHMACcheckFailed is the error for failed SECURITY check.
 	//The payload does _NOT_ has vaild data.
 	ErrHMACcheckFailed = errors.New(
-		"SECURITY: HMAC check failed.")
+		"SECURITY: HMAC check failed")
 
 	//ErrPayloadSizeTooSmall is the error for a payload byte slice with an
 	//incorrect length.

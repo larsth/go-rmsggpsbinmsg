@@ -7,7 +7,7 @@ import (
 
 const timeStampOctets = 8
 
-//TimeStamp contains the timestamp, which is used to distinghish between an old 
+//TimeStamp contains the timestamp, which is used to distinghish between an old
 //message and a new message.
 type TimeStamp struct {
 	Time time.Time
@@ -20,8 +20,8 @@ func (t *TimeStamp) MarshalJSON() ([]byte, error) {
 	return t.Time.MarshalJSON()
 }
 
-//UnmarshalJSON implements the json.Unmarshaler interface. 
-//The time is expected to be a quoted string in RFC 3339 format. 
+//UnmarshalJSON implements the json.Unmarshaler interface.
+//The time is expected to be a quoted string in RFC 3339 format.
 func (t *TimeStamp) UnmarshalJSON(data []byte) error {
 	return t.Time.UnmarshalJSON(data)
 }
@@ -50,7 +50,7 @@ func (t *TimeStamp) marshalBytes() (v1, v2, v3, v4, v5, v6, v7, v8 byte) {
 
 func (t *TimeStamp) unmarshalBytes(v1, v2, v3, v4, v5, v6, v7, v8 byte) {
 	var (
-		p = make([]byte, 8)
+		p   = make([]byte, 8)
 		i64 int64
 		d   time.Duration
 	)
