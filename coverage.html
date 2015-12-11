@@ -342,11 +342,11 @@ type Secrets struct {
 //Payload is a type which is a representaion of the payload transmitted
 //between RMSG.dk programs.
 type Payload struct {
-        mutex         sync.Mutex
-        Secrets       Secrets
+        mutex         sync.Mutex `json:"-"`
+        Secrets       Secrets    `json:"-"`
         Message       Message
-        messageOctets []byte
-        hMACOctets    []byte
+        messageOctets []byte `json:"-"`
+        hMACOctets    []byte `json:"-"`
 }
 
 func createHMAC(hmacKey, salt, messageOctets []byte) (octets []byte, err error) <span class="cov9" title="13">{
