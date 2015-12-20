@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/larsth/go-gpsfix"
 	"github.com/larsth/go-rmsggpsbinmsg/testdata"
 )
 
@@ -307,10 +308,10 @@ var tdPayloadMarshalBinary = []*TtdPayloadMarshalBinary{
 		Init: func(testItem *TtdPayloadMarshalBinary) {
 			testItem.P = tFnCreatePayload()
 			fmPtr := &testItem.P.Message.Gps.FixMode
-			(*fmPtr) = FixMode(0x04)
+			(*fmPtr) = gpsfix.FixMode(0x04)
 		},
 		WantData: nil,
-		WantErr:  ErrUnknownFixMode,
+		WantErr:  gpsfix.ErrUnknownFixMode,
 	},
 	//Test 3:
 	&TtdPayloadMarshalBinary{
@@ -325,7 +326,7 @@ var tdPayloadMarshalBinary = []*TtdPayloadMarshalBinary{
 func tFnCreatePayload() (p *Payload) {
 	p, _ = New(testdata.HmacKey(), testdata.Salt())
 	fmPtr := &(p.Message.Gps.FixMode)
-	(*fmPtr) = Fix3D
+	(*fmPtr) = gpsfix.Fix3D
 	p.Message.Gps.Latitude = testdata.Latitude()
 	p.Message.Gps.Longitude = testdata.Longitude()
 	p.Message.Gps.Altitude = testdata.Altitude()
@@ -399,7 +400,7 @@ func TestPayloadUnmarshalBinary1(t *testing.T) {
 
 func TestPayloadUnmarshalBinary2(t *testing.T) {
 	var (
-		wantErr = ErrUnknownFixMode
+		wantErr = gpsfix.ErrUnknownFixMode
 		data    []byte
 		p       = new(Payload)
 		i       int // = 0
@@ -440,8 +441,8 @@ func TestPayloadUnmarshalBinary3(t *testing.T) {
 	}
 	if ok == true {
 		sGot = p.Message.Gps.FixMode.String()
-		fmPtr := new(FixMode)
-		(*fmPtr) = Fix3D
+		fmPtr := new(gpsfix.FixMode)
+		(*fmPtr) = gpsfix.Fix3D
 		sWant = fmPtr.String()
 		if strings.Compare(sWant, sGot) != 0 {
 			s = mkStrErrString("FixMode", sGot, sWant)

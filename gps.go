@@ -1,14 +1,16 @@
 package binmsg
 
+import "github.com/larsth/go-gpsfix"
+
 const gpsOctets = 13
 
 //Gps is type that contain a FixMode and the 32-bit floating point values:
 //Latitude, Longitude, and Altitude.
 type Gps struct {
-	FixMode   FixMode `json:"fixmode"`
-	Latitude  float32 `json:"latitude"`
-	Longitude float32 `json:"longitude"`
-	Altitude  float32 `json:"altitude"`
+	FixMode   gpsfix.FixMode `json:"fixmode"`
+	Latitude  float32        `json:"latitude"`
+	Longitude float32        `json:"longitude"`
+	Altitude  float32        `json:"altitude"`
 }
 
 //Alt return a float64 representation of the Altitude.

@@ -139,7 +139,7 @@ func (p *Payload) MarshalBinary() (data []byte, err error) {
 	//the message ...
 	//	1.0 Marshal The Gps structure to binary ...
 	//	1.1 Marshal the FixMode value
-	p.messageOctets[0], err = p.Message.Gps.FixMode.marshalByte()
+	p.messageOctets[0], err = p.Message.Gps.FixMode.MarshalByte()
 	if err != nil {
 		return nil, err
 	}
@@ -235,7 +235,7 @@ func (p *Payload) UnmarshalBinary(data []byte) error {
 	// 4.1.0 Unmarshal the GPS POI ...
 	// 4.1.1 Unmarshal the FixMode ...
 	b = p.messageOctets[0]
-	if err = (&p.Message.Gps.FixMode).unmarshalByte(b); err != nil {
+	if err = (&p.Message.Gps.FixMode).UnmarshalByte(b); err != nil {
 		return err
 	}
 	// 4.1.2 Unmarshal the latitude ...
