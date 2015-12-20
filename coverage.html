@@ -54,17 +54,15 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">github.com/larsth/go-rmsggpsbinmsg/fixmode.go (100.0%)</option>
+				<option value="file0">github.com/larsth/go-rmsggpsbinmsg/gps.go (100.0%)</option>
 				
-				<option value="file1">github.com/larsth/go-rmsggpsbinmsg/gps.go (100.0%)</option>
+				<option value="file1">github.com/larsth/go-rmsggpsbinmsg/init.go (100.0%)</option>
 				
-				<option value="file2">github.com/larsth/go-rmsggpsbinmsg/init.go (100.0%)</option>
+				<option value="file2">github.com/larsth/go-rmsggpsbinmsg/misc.go (100.0%)</option>
 				
-				<option value="file3">github.com/larsth/go-rmsggpsbinmsg/misc.go (100.0%)</option>
+				<option value="file3">github.com/larsth/go-rmsggpsbinmsg/payload.go (100.0%)</option>
 				
-				<option value="file4">github.com/larsth/go-rmsggpsbinmsg/payload.go (100.0%)</option>
-				
-				<option value="file5">github.com/larsth/go-rmsggpsbinmsg/timestamp.go (100.0%)</option>
+				<option value="file4">github.com/larsth/go-rmsggpsbinmsg/timestamp.go (100.0%)</option>
 				
 				</select>
 			</div>
@@ -89,142 +87,17 @@
 		
 		<pre class="file" id="file0" >package binmsg
 
-//FixMode is a type used for indication no GPS fix, 2D GPS fix, and 3D GPS fix.
-type FixMode byte
-
-func (f *FixMode) String() string <span class="cov10" title="7">{
-        switch *f </span>{
-        <span class="cov1" title="1">case FixNotSeen:
-                return "Not Seen"</span>
-        <span class="cov1" title="1">case FixNone:
-                return "None"</span>
-        <span class="cov1" title="1">case Fix2D:
-                return "2D"</span>
-        <span class="cov6" title="3">case Fix3D:
-                return "3D"</span>
-        }
-        <span class="cov1" title="1">return "Unknown FixMode value"</span> //make compiler happy
-}
-
-//MarshalJSON implements the json.Marshaler interface.
-//It marshals a valid FixMode value to the ASCII 8-bit/UTF-8 values:
-//"0", "1", "2", or "3".
-//If the FixMode is valid it returns that value in a 1-byte byte slice, and
-//a nil error.
-//
-//If the FixMode is not a valid FixMode value, then the
-//nil byte slice, and the ErrUnknownFixMode error are returned.
-func (f *FixMode) MarshalJSON() ([]byte, error) <span class="cov8" title="5">{
-        var (
-                p = make([]byte, 1, 1)
-        )
-        switch *f </span>{
-        <span class="cov1" title="1">case FixNotSeen:
-                p[0] = 0x30 //ASCII/UTF8: "0"
-                return p, nil</span>
-        <span class="cov1" title="1">case FixNone:
-                p[0] = 0x31 //ASCII/UTF8: "1"
-                return p, nil</span>
-        <span class="cov1" title="1">case Fix2D:
-                p[0] = 0x32 //ASCII/UTF8: "2"
-                return p, nil</span>
-        <span class="cov1" title="1">case Fix3D:
-                p[0] = 0x33 //ASCII/UTF8: "3"
-                return p, nil</span>
-        }
-        <span class="cov1" title="1">return nil, ErrUnknownFixMode</span>
-}
-
-//UnmarshalJSON implements the json.Unmarshaler interface.
-//It unmarshals the ASCII 8-bit/UTF-8 values: "0", "1", "2", or "3" to a
-//FixMode value. If any other value than the above vlauea are met, then
-//UnmarshalJSON return the ErrUnknownFixMode, and sets the FixMode value to 253.
-func (f *FixMode) UnmarshalJSON(p []byte) error <span class="cov9" title="6">{
-        if len(p) == 0 </span><span class="cov1" title="1">{
-                (*f) = FixMode(byte(252))
-                return ErrNilSlice
-        }</span>
-        <span class="cov8" title="5">switch p[0] </span>{
-        <span class="cov1" title="1">case 0x30: //ASCII/UTF8: "0"
-                (*f) = FixNotSeen
-                return nil</span>
-        <span class="cov1" title="1">case 0x31: //ASCII/UTF8: "1"
-                (*f) = FixNone
-                return nil</span>
-        <span class="cov1" title="1">case 0x32: //ASCII/UTF8: "2"
-                (*f) = Fix2D
-                return nil</span>
-        <span class="cov1" title="1">case 0x33: //ASCII/UTF8: "3"
-                (*f) = Fix3D
-                return nil</span>
-        }
-        <span class="cov1" title="1">(*f) = FixMode(byte(253))
-        return ErrUnknownFixMode</span>
-}
-
-func (f *FixMode) marshalByte() (v byte, err error) <span class="cov10" title="7">{
-        err = nil
-        switch *f </span>{
-        <span class="cov1" title="1">case FixNotSeen:
-                v = 0
-                return v, nil</span>
-        <span class="cov1" title="1">case FixNone:
-                v = 1
-                return v, nil</span>
-        <span class="cov1" title="1">case Fix2D:
-                v = 2
-                return v, nil</span>
-        <span class="cov4" title="2">case Fix3D:
-                v = 3
-                return v, nil</span>
-        }
-        <span class="cov4" title="2">err = ErrUnknownFixMode
-        v = 255
-        return</span>
-}
-
-func (f *FixMode) unmarshalByte(data byte) error <span class="cov10" title="7">{
-        switch data </span>{
-        <span class="cov1" title="1">case 0:
-                (*f) = FixNotSeen
-                return nil</span>
-        <span class="cov1" title="1">case 1:
-                (*f) = FixNone
-                return nil</span>
-        <span class="cov1" title="1">case 2:
-                (*f) = Fix2D
-                return nil</span>
-        <span class="cov4" title="2">case 3:
-                (*f) = Fix3D
-                return nil</span>
-        }
-        <span class="cov4" title="2">(*f) = FixMode(byte(255))
-        return ErrUnknownFixMode</span>
-}
-
-const (
-        //FixNotSeen means that there is no knowledge of what kind of fix a GPS has.
-        FixNotSeen FixMode = 0
-        //FixNone means that the GPS hasn´t a fix.
-        FixNone FixMode = 1
-        //Fix2D means that the GPS has a 2D fix.
-        Fix2D FixMode = 2
-        //Fix3D means that the GPS has a 3D fix.
-        Fix3D FixMode = 3
-)
-</pre>
-		
-		<pre class="file" id="file1" style="display: none">package binmsg
+import "github.com/larsth/go-gpsfix"
 
 const gpsOctets = 13
 
 //Gps is type that contain a FixMode and the 32-bit floating point values:
 //Latitude, Longitude, and Altitude.
 type Gps struct {
-        FixMode   FixMode `json:"fixmode"`
-        Latitude  float32 `json:"latitude"`
-        Longitude float32 `json:"longitude"`
-        Altitude  float32 `json:"altitude"`
+        FixMode   gpsfix.FixMode `json:"fixmode"`
+        Latitude  float32        `json:"latitude"`
+        Longitude float32        `json:"longitude"`
+        Altitude  float32        `json:"altitude"`
 }
 
 //Alt return a float64 representation of the Altitude.
@@ -261,7 +134,7 @@ func (g *Gps) SetLon(v float64) <span class="cov8" title="1">{
 }</span>
 </pre>
 		
-		<pre class="file" id="file2" style="display: none">package binmsg
+		<pre class="file" id="file1" style="display: none">package binmsg
 
 import (
         "errors"
@@ -291,7 +164,7 @@ func initBinMsg() error <span class="cov10" title="2">{
 }</span>
 </pre>
 		
-		<pre class="file" id="file3" style="display: none">package binmsg
+		<pre class="file" id="file2" style="display: none">package binmsg
 
 import (
         "encoding/binary"
@@ -316,7 +189,7 @@ func float32UnmarshalBinary(p []byte) float32 <span class="cov8" title="4">{
 }</span>
 </pre>
 		
-		<pre class="file" id="file4" style="display: none">package binmsg
+		<pre class="file" id="file3" style="display: none">package binmsg
 
 import (
         "crypto/hmac"
@@ -457,7 +330,7 @@ func (p *Payload) MarshalBinary() (data []byte, err error) <span class="cov5" ti
         //the message ...
         //        1.0 Marshal The Gps structure to binary ...
         //        1.1 Marshal the FixMode value
-        p.messageOctets[0], err = p.Message.Gps.FixMode.marshalByte()
+        p.messageOctets[0], err = p.Message.Gps.FixMode.MarshalByte()
         if err != nil </span><span class="cov1" title="1">{
                 return nil, err
         }</span>
@@ -553,7 +426,7 @@ func (p *Payload) UnmarshalBinary(data []byte) error <span class="cov5" title="4
         // 4.1.0 Unmarshal the GPS POI ...
         // 4.1.1 Unmarshal the FixMode ...
         <span class="cov3" title="2">b = p.messageOctets[0]
-        if err = (&amp;p.Message.Gps.FixMode).unmarshalByte(b); err != nil </span><span class="cov1" title="1">{
+        if err = (&amp;p.Message.Gps.FixMode).UnmarshalByte(b); err != nil </span><span class="cov1" title="1">{
                 return err
         }</span>
         // 4.1.2 Unmarshal the latitude ...
@@ -579,7 +452,7 @@ func (p *Payload) UnmarshalBinary(data []byte) error <span class="cov5" title="4
 }
 </pre>
 		
-		<pre class="file" id="file5" style="display: none">package binmsg
+		<pre class="file" id="file4" style="display: none">package binmsg
 
 import (
         "encoding/binary"
