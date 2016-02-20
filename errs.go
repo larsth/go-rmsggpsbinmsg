@@ -37,4 +37,6 @@ var (
 	//wrong length/size.
 	ErrNilMessageOctetsSlice = errors.New(
 		"The messageoctets byte slice is nil or has a zero length.")
+	ErrNilByteSlice = errors.New(
+		"<nil> byte slice")
 )

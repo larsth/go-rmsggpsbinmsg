@@ -4,8 +4,9 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"hash"
-	"log"
 	"sync"
+
+	"github.com/juju/errors"
 )
 
 const shaSize = sha256.Size224
@@ -38,15 +39,15 @@ func createHMAC(hmacKey, salt, messageOctets []byte) (octets []byte, err error) 
 
 	octets = nil
 	if len(hmacKey) == 0 {
-		err = ErrNilHMACSecretKeySlice
+		err = errors.Trace(ErrNilHMACSecretKeySlice)
 		return
 	}
 	if len(salt) == 0 {
-		err = ErrNiSaltSlice
+		err = errors.Trace(ErrNiSaltSlice)
 		return
 	}
 	if messageOctets == nil {
-		err = ErrNilMessageOctetsSlice
+		err = errors.Trace(ErrNilMessageOctetsSlice)
 		return
 	}
 	err = nil
@@ -69,17 +70,17 @@ func checkHMAC(hmacKey, salt, messageOctets, hmacOctets []byte) (err error) {
 	)
 
 	if len(hmacOctets) != shaSize {
-		err = ErrHMACOctetsWrongSize
+		err = errors.Trace(ErrHMACOctetsWrongSize)
 		ok = false
 		return
 	}
 	if expectedMAC, err = createHMAC(hmacKey, salt, messageOctets); err != nil {
-		return err
+		return errors.Annotate(err, "expectedMAC: createHMAC error")
 	}
 
 	ok = hmac.Equal(hmacOctets, expectedMAC)
 	if ok == false {
-		return ErrHMACcheckFailed
+		return errors.Trace(ErrHMACcheckFailed)
 	}
 	return nil
 }
@@ -93,10 +94,10 @@ func (p *Payload) Init(hmacKey []byte, salt []byte) error {
 	defer p.mutex.Unlock()
 
 	if len(hmacKey) == 0 {
-		return ErrNilHMACSecretKeySlice
+		return errors.Trace(ErrNilHMACSecretKeySlice)
 	}
 	if len(salt) == 0 {
-		return ErrNiSaltSlice
+		return errors.Trace(ErrNiSaltSlice)
 	}
 	p.Secrets.HMACKey = hmacKey
 	p.Secrets.Salt = salt
@@ -109,7 +110,9 @@ func (p *Payload) Init(hmacKey []byte, salt []byte) error {
 func New(hmacKey []byte, salt []byte) (*Payload, error) {
 	p := new(Payload)
 	if err := p.Init(hmacKey, salt); err != nil {
-		return nil, err
+		annotatedErr := errors.Annotate(err,
+			"Init(hmacKey, salt) error")
+		return nil, annotatedErr
 	}
 	return p, nil
 }
@@ -126,12 +129,12 @@ func (p *Payload) MarshalBinary() (data []byte, err error) {
 	data = nil
 	if len(p.Secrets.HMACKey) == 0 {
 		//HMAC secret is not set ...
-		err = ErrNilHMACSecretKeySlice
+		err = errors.Trace(ErrNilHMACSecretKeySlice)
 		return
 	}
 	if len(p.Secrets.Salt) == 0 {
 		//Salt (crypto random numbers) are not set ...
-		err = ErrNiSaltSlice
+		err = errors.Trace(ErrNiSaltSlice)
 		return
 	}
 	p.messageOctets = make([]byte, messageOctets, PayloadOctets)
@@ -141,7 +144,9 @@ func (p *Payload) MarshalBinary() (data []byte, err error) {
 	//	1.1 Marshal the FixMode value
 	p.messageOctets[0], err = p.Message.Gps.FixMode.MarshalByte()
 	if err != nil {
-		return nil, err
+		annotatedErr := errors.Annotate(err,
+			"Payload.Message.Gps.FixMode.MarshalByte() error")
+		return nil, annotatedErr
 	}
 	//Example FixMode value: Fix3D -> 0x03
 	//
@@ -215,8 +220,7 @@ func (p *Payload) UnmarshalBinary(data []byte) error {
 
 	// 1.0 Data argument octet size check ...
 	if len(data) < PayloadOctets {
-		log.Println(ErrPayloadSizeTooSmall)
-		return ErrPayloadSizeTooSmall
+		return errors.Trace(ErrPayloadSizeTooSmall)
 	}
 
 	// 2.0 Split the 'data' slice into the message slice and the hmac slice ...
@@ -227,7 +231,9 @@ func (p *Payload) UnmarshalBinary(data []byte) error {
 	err = checkHMAC(p.Secrets.HMACKey, p.Secrets.Salt, p.messageOctets,
 		p.hMACOctets)
 	if err != nil {
-		return err
+		annotatedErr := errors.Annotate(err,
+			"HMAC checking error")
+		return annotatedErr
 	}
 
 	// 4.0 Unmarshal the payload ...
@@ -236,7 +242,8 @@ func (p *Payload) UnmarshalBinary(data []byte) error {
 	// 4.1.1 Unmarshal the FixMode ...
 	b = p.messageOctets[0]
 	if err = (&p.Message.Gps.FixMode).UnmarshalByte(b); err != nil {
-		return err
+		return errors.Annotate(err,
+			"Package.Message.Gps.FixMode).UnmarshalByte error")
 	}
 	// 4.1.2 Unmarshal the latitude ...
 	s = p.messageOctets[1:5]

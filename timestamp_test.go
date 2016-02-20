@@ -7,6 +7,8 @@ import (
 	"log"
 	"testing"
 	"time"
+
+	"github.com/juju/errors"
 )
 
 type TtdTimeStampMarshal struct {
@@ -23,6 +25,14 @@ var tdTimeStampMarshalJSONWant = []*TtdTimeStampMarshal{
 			testItem.TS.Time = time.Date(2015, 01, 23, 12, 34, 59, 0, time.UTC)
 			testItem.WantPStr = testItem.TS.Time.Format(`"` + time.RFC3339Nano + `"`)
 			testItem.WantP = []byte(testItem.WantPStr)
+		},
+	},
+	//Test 1:
+	&TtdTimeStampMarshal{
+		Init: func(testItem *TtdTimeStampMarshal) {
+			testItem.TS.Time = time.Date(10000, 01, 23, 12, 34, 59, 0, time.UTC)
+			testItem.WantPStr = ""
+			testItem.WantP = make([]byte, 0, 1)
 		},
 	},
 }
@@ -66,7 +76,7 @@ func TestTimeStampMarshalJSON(t *testing.T) {
 type TtdTimeStampUnmarshal struct {
 	Init     func(testItem *TtdTimeStampUnmarshal)
 	WantTime time.Time
-	Data     string
+	Data     []byte //string
 	WantErr  error
 }
 
@@ -75,8 +85,31 @@ var tdTimeStampUnmarshalJSONWant = []*TtdTimeStampUnmarshal{
 	&TtdTimeStampUnmarshal{
 		Init: func(testItem *TtdTimeStampUnmarshal) {
 			testItem.WantTime = time.Date(2015, 01, 23, 12, 34, 59, 0, time.UTC)
-			testItem.Data = testItem.WantTime.Format(`"` + time.RFC3339Nano + `"`)
+			testItem.Data = []byte(testItem.WantTime.Format(
+				`"` + time.RFC3339Nano + `"`))
 			testItem.WantErr = nil
+		},
+	},
+	//Test 1:
+	//testItem.Data []byte = nil
+	&TtdTimeStampUnmarshal{
+		Init: func(testItem *TtdTimeStampUnmarshal) {
+			testItem.WantTime = time.Date(2015, 01, 23, 12, 34, 59, 0, time.UTC)
+			testItem.Data = nil
+			testItem.WantErr = errors.Annotate(ErrNilByteSlice,
+				"TimeStamp.UnmarshalJSON([]byte) error. Byte array: <nil>(\"\")")
+		},
+	},
+	//Test 2:
+	//testItem.Data = []byte("a")
+	&TtdTimeStampUnmarshal{
+		Init: func(testItem *TtdTimeStampUnmarshal) {
+			testItem.WantTime = time.Date(0001, 01, 01, 00, 00, 00, 0, time.UTC)
+			testItem.Data = []byte("a")
+			testItem.WantErr = errors.Errorf("%s %s%s",
+				`TimeStamp.UnmarshalJSON([]byte) error. Byte array:`,
+				`[]byte{0x61} (a): parsing time "a" as ""`,
+				`2006-01-02T15:04:05Z07:00"": cannot parse "a" as """`)
 		},
 	},
 }
@@ -91,7 +124,6 @@ func TestTimeStampUnmarshalJSON(t *testing.T) {
 	//		return
 	//	}
 	var (
-		data   []byte
 		gotTS  TimeStamp
 		gotErr error
 	)
@@ -102,8 +134,7 @@ func TestTimeStampUnmarshalJSON(t *testing.T) {
 		if testItem.Init != nil {
 			testItem.Init(testItem)
 		}
-		data = []byte(testItem.Data)
-		gotErr = gotTS.UnmarshalJSON(data)
+		gotErr = gotTS.UnmarshalJSON(testItem.Data)
 
 		if gotTS.Time.Equal(testItem.WantTime) == false {
 			t.Fatalf("Test: %d:: Got: '%s', Want: '%s'\n",
@@ -114,23 +145,6 @@ func TestTimeStampUnmarshalJSON(t *testing.T) {
 		}
 	}
 }
-
-//type TtdTimeStampMarshalBinary struct {
-//	Init     func(testItem *TtdTimeStampMarshalBinary)
-//	TS       TimeStamp
-//	WantData []byte
-//	WantErr  error
-//}
-
-//var tdTimeStampMarshalBinary = []*TtdTimeStampMarshalBinary{
-//	&TtdTimeStampMarshalBinary{
-//		Init: func(testItem *TtdTimeStampMarshalBinary) {
-//			testItem.TS.Time = time.Date(2015, 01, 23, 12, 34, 59, 0, time.UTC)
-//		},
-//		WantData: []byte{129, 6, 76, 30, 13, 87, 190, 0},
-//		WantErr:  nil,
-//	},
-//}
 
 func TestTimeStampMarshalBinary(t *testing.T) {
 	const (

@@ -3,6 +3,8 @@ package binmsg
 import (
 	"encoding/binary"
 	"time"
+
+	"github.com/juju/errors"
 )
 
 const timeStampOctets = 8
@@ -17,13 +19,28 @@ type TimeStamp struct {
 // The time is a quoted string in RFC 3339 format, with sub-second precision
 //added if present.
 func (t *TimeStamp) MarshalJSON() ([]byte, error) {
-	return t.Time.MarshalJSON()
+	p, err := t.Time.MarshalJSON()
+	if err != nil {
+		return p, errors.Annotate(err, "TimeStamp.MarshalJSON() error")
+	}
+	return p, nil
 }
 
 //UnmarshalJSON implements the json.Unmarshaler interface.
 //The time is expected to be a quoted string in RFC 3339 format.
 func (t *TimeStamp) UnmarshalJSON(data []byte) error {
-	return t.Time.UnmarshalJSON(data)
+	var err error
+	
+	if len(data) == 0 {
+		return errors.Annotate(ErrNilByteSlice, 
+			"TimeStamp.UnmarshalJSON([]byte) error. Byte array: <nil>(\"\")")
+	}
+	if err = t.Time.UnmarshalJSON(data); err != nil {
+		return errors.Annotatef(err, "%s. Byte array: %#v (%s)",
+			"TimeStamp.UnmarshalJSON([]byte) error",
+			data, string(data))
+	}
+	return nil
 }
 
 func (t *TimeStamp) marshalBytes() (v1, v2, v3, v4, v5, v6, v7, v8 byte) {

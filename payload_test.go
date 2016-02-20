@@ -1,6 +1,7 @@
 package binmsg
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"testing"
@@ -127,7 +128,10 @@ var tdCheckHMAC = []*TtdCheckMac{
 		Salt:           nil,
 		MessageOctets:  nil,
 		WantHmacOctets: nil,
-		WantErr:        ErrNilHMACSecretKeySlice,
+		//WantErr: ErrNilHMACSecretKeySlice inlined via juju/errors package
+		WantErr: fmt.Errorf("%s%s",
+			"expectedMAC: createHMAC error: The 'HMACSecretKey' byte slice ",
+			"has not been set (It is nil or its length is zero)."),
 	},
 	//Test 2:
 	&TtdCheckMac{
@@ -136,7 +140,10 @@ var tdCheckHMAC = []*TtdCheckMac{
 		Salt:           nil,
 		MessageOctets:  nil,
 		WantHmacOctets: nil,
-		WantErr:        ErrNiSaltSlice,
+		//WantErr: ErrNiSaltSlice inlined via juju/errors package
+		WantErr: fmt.Errorf("%s%s",
+			"expectedMAC: createHMAC error: The 'Salt' byte slice has ",
+			"not been set (It is nil or its length is zero)."),
 	},
 	//Test 3:
 	&TtdCheckMac{
@@ -145,7 +152,11 @@ var tdCheckHMAC = []*TtdCheckMac{
 		Salt:           testdata.Salt(),
 		MessageOctets:  nil,
 		WantHmacOctets: nil,
-		WantErr:        ErrNilMessageOctetsSlice,
+		//WantErr: ErrNilMessageOctetsSlice inlined via juju/errors package
+		WantErr: fmt.Errorf("%s%s",
+			"expectedMAC: createHMAC error: The messageoctets byte slice ",
+			"is nil or has a zero length."),
+		//,
 	},
 	//Test 4, check should fail (FixMode changed from 0x04 to 0x05):
 	&TtdCheckMac{
@@ -209,19 +220,23 @@ func funcPayloadInitWant(i int, testItem *TtdPayloadInit, p *Payload) (s string,
 	return
 }
 
-var tdPayloadInit = []*TtdPayloadInit{
+var tdPayloadInit1 = []*TtdPayloadInit{
 	//Test 0:
 	&TtdPayloadInit{
-		HmacKey:  nil,
-		Salt:     nil,
-		WantErr:  ErrNilHMACSecretKeySlice,
+		HmacKey: nil,
+		Salt:    nil,
+		//WantErr: ErrNilHMACSecretKeySlice inlined via juju/errors package
+		WantErr: fmt.Errorf("%s",
+			"The 'HMACSecretKey' byte slice has not been set (It is nil or its length is zero)."),
 		WantFunc: nil,
 	},
 	//Test 1:
 	&TtdPayloadInit{
-		HmacKey:  testdata.HmacKey(),
-		Salt:     nil,
-		WantErr:  ErrNiSaltSlice,
+		HmacKey: testdata.HmacKey(),
+		Salt:    nil,
+		//WantErr: ErrNiSaltSlice inlined via juju/errors package
+		WantErr: fmt.Errorf("%s",
+			"The 'Salt' byte slice has not been set (It is nil or its length is zero)."),
 		WantFunc: nil,
 	},
 	//Test 2:
@@ -240,7 +255,7 @@ func TestPayloadInit(t *testing.T) {
 		s      string
 		ok     bool
 	)
-	for i, testItem := range tdPayloadInit {
+	for i, testItem := range tdPayloadInit1 {
 		p = new(Payload)
 		gotErr = p.Init(testItem.HmacKey, testItem.Salt)
 		if s, ok = errorCheck(i, gotErr, testItem.WantErr); ok == false {
@@ -254,6 +269,36 @@ func TestPayloadInit(t *testing.T) {
 	}
 }
 
+var tdPayloadInit2 = []*TtdPayloadInit{
+	//Test 0:
+	&TtdPayloadInit{
+		HmacKey: nil,
+		Salt:    nil,
+		//WantErr: ErrNilHMACSecretKeySlice inlined via juju/errors package
+		WantErr: fmt.Errorf("%s%s",
+			"Init(hmacKey, salt) error: The 'HMACSecretKey' ",
+			"byte slice has not been set (It is nil or its length is zero)."),
+		WantFunc: nil,
+	},
+	//Test 1:
+	&TtdPayloadInit{
+		HmacKey: testdata.HmacKey(),
+		Salt:    nil,
+		//WantErr: ErrNiSaltSlice inlined via juju/errors package
+		WantErr: fmt.Errorf("%s%s",
+			"Init(hmacKey, salt) error: The 'Salt' byte slice has not been set",
+			" (It is nil or its length is zero)."),
+		WantFunc: nil,
+	},
+	//Test 2:
+	&TtdPayloadInit{
+		HmacKey:  testdata.HmacKey(),
+		Salt:     testdata.Salt(),
+		WantErr:  nil,
+		WantFunc: funcPayloadInitWant,
+	},
+}
+
 func TestPayloadNew(t *testing.T) {
 	var (
 		p      *Payload
@@ -261,7 +306,7 @@ func TestPayloadNew(t *testing.T) {
 		s      string
 		ok     bool
 	)
-	for i, testItem := range tdPayloadInit {
+	for i, testItem := range tdPayloadInit2 {
 		p, gotErr = New(testItem.HmacKey, testItem.Salt)
 		if s, ok = errorCheck(i, gotErr, testItem.WantErr); ok == false {
 			t.Error(s)
@@ -311,7 +356,11 @@ var tdPayloadMarshalBinary = []*TtdPayloadMarshalBinary{
 			(*fmPtr) = gpsfix.FixMode(0x04)
 		},
 		WantData: nil,
-		WantErr:  gpsfix.ErrUnknownFixMode,
+		//WantErr: gpsfix.ErrUnknownFixMode inlined via juju/errors package
+		WantErr: fmt.Errorf("%s%s%s",
+			"Payload.Message.Gps.FixMode.MarshalByte() error: Unknown FixMode ",
+			"value: valid values are FixNotSeen, 0 or FixNone, 1 or Fix2D, 2 ",
+			"or Fix3D, 3."),
 	},
 	//Test 3:
 	&TtdPayloadMarshalBinary{
@@ -376,13 +425,15 @@ func TestPayloadUnmarshalBinary0(t *testing.T) {
 
 func TestPayloadUnmarshalBinary1(t *testing.T) {
 	var (
-		wantErr = ErrHMACcheckFailed
-		data    []byte
-		p       = new(Payload)
-		i       int // = 0
-		gotErr  error
-		s       string
-		ok      bool
+		//wantErr: ErrHMACcheckFailed inlined via juju/errors package
+		wantErr = fmt.Errorf("%s",
+			"HMAC checking error: SECURITY: HMAC check failed")
+		data   []byte
+		p      = new(Payload)
+		i      int // = 0
+		gotErr error
+		s      string
+		ok     bool
 	)
 
 	//Init ...
@@ -400,13 +451,17 @@ func TestPayloadUnmarshalBinary1(t *testing.T) {
 
 func TestPayloadUnmarshalBinary2(t *testing.T) {
 	var (
-		wantErr = gpsfix.ErrUnknownFixMode
-		data    []byte
-		p       = new(Payload)
-		i       int // = 0
-		gotErr  error
-		s       string
-		ok      bool
+		//wantErr: gpsfix.ErrUnknownFixMode inlined via juju/errors package
+		wantErr = fmt.Errorf("%s%s%s",
+			"Package.Message.Gps.FixMode).UnmarshalByte error: ",
+			"Unknown FixMode value: valid values are FixNotSeen, 0 or ",
+			"FixNone, 1 or Fix2D, 2 or Fix3D, 3.")
+		data   []byte
+		p      = new(Payload)
+		i      int // = 0
+		gotErr error
+		s      string
+		ok     bool
 	)
 
 	//Init ...
