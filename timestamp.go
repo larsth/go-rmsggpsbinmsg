@@ -30,9 +30,9 @@ func (t *TimeStamp) MarshalJSON() ([]byte, error) {
 //The time is expected to be a quoted string in RFC 3339 format.
 func (t *TimeStamp) UnmarshalJSON(data []byte) error {
 	var err error
-	
+
 	if len(data) == 0 {
-		return errors.Annotate(ErrNilByteSlice, 
+		return errors.Annotate(ErrNilByteSlice,
 			"TimeStamp.UnmarshalJSON([]byte) error. Byte array: <nil>(\"\")")
 	}
 	if err = t.Time.UnmarshalJSON(data); err != nil {

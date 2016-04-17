@@ -6,6 +6,9 @@ github.com/larsth/go-rmsggpsbinmsg/gps.go:39:		SetLat				100.0%
 github.com/larsth/go-rmsggpsbinmsg/gps.go:45:		SetLon				100.0%
 github.com/larsth/go-rmsggpsbinmsg/init.go:14:		init				100.0%
 github.com/larsth/go-rmsggpsbinmsg/init.go:18:		initBinMsg			100.0%
+github.com/larsth/go-rmsggpsbinmsg/message.go:23:	MarshalBinary			0.0%
+github.com/larsth/go-rmsggpsbinmsg/message.go:82:	UnmarshalBinary			0.0%
+github.com/larsth/go-rmsggpsbinmsg/message.go:124:	Strings				0.0%
 github.com/larsth/go-rmsggpsbinmsg/misc.go:8:		float32MarshalBinary		100.0%
 github.com/larsth/go-rmsggpsbinmsg/misc.go:15:		float32MarshalBinaryValues	100.0%
 github.com/larsth/go-rmsggpsbinmsg/misc.go:20:		float32UnmarshalBinary		100.0%
@@ -19,4 +22,4 @@ github.com/larsth/go-rmsggpsbinmsg/timestamp.go:21:	MarshalJSON			100.0%
 github.com/larsth/go-rmsggpsbinmsg/timestamp.go:31:	UnmarshalJSON			100.0%
 github.com/larsth/go-rmsggpsbinmsg/timestamp.go:46:	marshalBytes			100.0%
 github.com/larsth/go-rmsggpsbinmsg/timestamp.go:68:	unmarshalBytes			100.0%
-total:							(statements)			100.0%
+total:							(statements)			75.7%
