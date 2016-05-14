@@ -17,8 +17,7 @@ type Message struct {
 	//TimeStamp octets: timeStampOctets(=8) bytes (type time.Duration is an int64 value)
 	TimeStamp TimeStamp `json:"timestamp"`
 	//Gps octets: gpsOctet bytes
-	Gps            Gps `json:"gps"`
-	FloatPrecision int `json:"-"`
+	Gps Gps `json:"gps"`
 }
 
 func IsSameFloat64(a, b float64, precision int) (aTxt string, bTxt string, ok bool) {
@@ -28,7 +27,7 @@ func IsSameFloat64(a, b float64, precision int) (aTxt string, bTxt string, ok bo
 	return
 }
 
-func (m *Message) IsEqual(other *Message) (s []string, ok bool) {
+func (m *Message) IsEqual(other *Message, precision int) (s []string, ok bool) {
 	var t string
 
 	if m == nil && other == nil {
@@ -64,17 +63,17 @@ func (m *Message) IsEqual(other *Message) (s []string, ok bool) {
 		s = append(s, t)
 	}
 
-	if a, b, ok := IsSameFloat64(m.Gps.Lat(), other.Gps.Lat(), m.FloatPrecision); !ok {
+	if a, b, ok := IsSameFloat64(m.Gps.Lat(), other.Gps.Lat(), precision); !ok {
 		t = fmt.Sprintf("\t\tGot Latitude: %s,\n\t\tWant Latitude: %s", a, b)
 		s = append(s, t)
 	}
 
-	if a, b, ok := IsSameFloat64(m.Gps.Lon(), other.Gps.Lon(), m.FloatPrecision); !ok {
+	if a, b, ok := IsSameFloat64(m.Gps.Lon(), other.Gps.Lon(), precision); !ok {
 		t = fmt.Sprintf("\t\tGot Longitude: %s,\n\t\tWant Longitude: %s", a, b)
 		s = append(s, t)
 	}
 
-	if a, b, ok := IsSameFloat64(m.Gps.Alt(), other.Gps.Alt(), m.FloatPrecision); !ok {
+	if a, b, ok := IsSameFloat64(m.Gps.Alt(), other.Gps.Alt(), precision); !ok {
 		t = fmt.Sprintf("\t\tGot Altitude: %s,\n\t\tWant Altitude: %s", a, b)
 		s = append(s, t)
 	}
