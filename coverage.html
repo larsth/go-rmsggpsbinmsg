@@ -167,7 +167,9 @@ func initBinMsg() <span class="cov10" title="2">{
 		<pre class="file" id="file2" style="display: none">package binmsg
 
 import (
+        "fmt"
         "strconv"
+        "strings"
         "time"
 
         "github.com/juju/errors"
@@ -181,7 +183,72 @@ type Message struct {
         //TimeStamp octets: timeStampOctets(=8) bytes (type time.Duration is an int64 value)
         TimeStamp TimeStamp `json:"timestamp"`
         //Gps octets: gpsOctet bytes
-        Gps Gps `json:"gps"`
+        Gps            Gps `json:"gps"`
+        FloatPrecision int `json:"-"`
+}
+
+func IsSameFloat64(a, b float64, precision int) (aTxt string, bTxt string, ok bool) <span class="cov0" title="0">{
+        aTxt = strconv.FormatFloat(a, 'f', precision, 64)
+        bTxt = strconv.FormatFloat(b, 'f', precision, 64)
+        ok = (strings.Compare(aTxt, bTxt) == 0)
+        return
+}</span>
+
+func (m *Message) IsEqual(other *Message) (s []string, ok bool) <span class="cov0" title="0">{
+        var t string
+
+        if m == nil &amp;&amp; other == nil </span><span class="cov0" title="0">{
+                return nil, false
+        }</span>
+
+        <span class="cov0" title="0">s = make([]string, 0, 16)
+
+        if m == nil &amp;&amp; other != nil </span><span class="cov0" title="0">{
+                t = fmt.Sprintf("\t\tGot: &lt;nil&gt;,\n\t\tWant: '%#v'", other)
+                s = append(s, t)
+                return s, false
+        }</span>
+
+        <span class="cov0" title="0">if m != nil &amp;&amp; other == nil </span><span class="cov0" title="0">{
+                t = fmt.Sprintf("\t\tGot: '%#v',\n\t\tWant: &lt;nil&gt;", m)
+                s = append(s, t)
+                return s, false
+        }</span>
+
+        // (got != nil &amp;&amp; want != nil) == true
+
+        <span class="cov0" title="0">if m.TimeStamp.Time.Nanosecond() != other.TimeStamp.Time.Nanosecond() </span><span class="cov0" title="0">{
+                t = fmt.Sprintf("\t\tGot TimeStamp.Time: %s,\n\t\tWant TimeStamp.Time: %s",
+                        m.TimeStamp.Time.String(),
+                        other.TimeStamp.Time.String())
+                s = append(s, t)
+        }</span>
+
+        <span class="cov0" title="0">if strings.Compare(m.Gps.FixMode.String(), other.Gps.FixMode.String()) != 0 </span><span class="cov0" title="0">{
+                t = fmt.Sprintf("\t\tGot FixMode: %s,\n\t\tWant FixMode: %s",
+                        m.Gps.FixMode.String(), other.Gps.FixMode.String())
+                s = append(s, t)
+        }</span>
+
+        <span class="cov0" title="0">if a, b, ok := IsSameFloat64(m.Gps.Lat(), other.Gps.Lat(), m.FloatPrecision); !ok </span><span class="cov0" title="0">{
+                t = fmt.Sprintf("\t\tGot Latitude: %s,\n\t\tWant Latitude: %s", a, b)
+                s = append(s, t)
+        }</span>
+
+        <span class="cov0" title="0">if a, b, ok := IsSameFloat64(m.Gps.Lon(), other.Gps.Lon(), m.FloatPrecision); !ok </span><span class="cov0" title="0">{
+                t = fmt.Sprintf("\t\tGot Longitude: %s,\n\t\tWant Longitude: %s", a, b)
+                s = append(s, t)
+        }</span>
+
+        <span class="cov0" title="0">if a, b, ok := IsSameFloat64(m.Gps.Alt(), other.Gps.Alt(), m.FloatPrecision); !ok </span><span class="cov0" title="0">{
+                t = fmt.Sprintf("\t\tGot Altitude: %s,\n\t\tWant Altitude: %s", a, b)
+                s = append(s, t)
+        }</span>
+
+        <span class="cov0" title="0">if len(s) &gt; 0 </span><span class="cov0" title="0">{
+                return s, false
+        }</span>
+        <span class="cov0" title="0">return s, true</span>
 }
 
 //MarshalBinary marshals the struct fields from type Message into a

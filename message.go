@@ -1,7 +1,9 @@
 package binmsg
 
 import (
+	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/juju/errors"
@@ -15,7 +17,72 @@ type Message struct {
 	//TimeStamp octets: timeStampOctets(=8) bytes (type time.Duration is an int64 value)
 	TimeStamp TimeStamp `json:"timestamp"`
 	//Gps octets: gpsOctet bytes
-	Gps Gps `json:"gps"`
+	Gps            Gps `json:"gps"`
+	FloatPrecision int `json:"-"`
+}
+
+func IsSameFloat64(a, b float64, precision int) (aTxt string, bTxt string, ok bool) {
+	aTxt = strconv.FormatFloat(a, 'f', precision, 64)
+	bTxt = strconv.FormatFloat(b, 'f', precision, 64)
+	ok = (strings.Compare(aTxt, bTxt) == 0)
+	return
+}
+
+func (m *Message) IsEqual(other *Message) (s []string, ok bool) {
+	var t string
+
+	if m == nil && other == nil {
+		return nil, false
+	}
+
+	s = make([]string, 0, 16)
+
+	if m == nil && other != nil {
+		t = fmt.Sprintf("\t\tGot: <nil>,\n\t\tWant: '%#v'", other)
+		s = append(s, t)
+		return s, false
+	}
+
+	if m != nil && other == nil {
+		t = fmt.Sprintf("\t\tGot: '%#v',\n\t\tWant: <nil>", m)
+		s = append(s, t)
+		return s, false
+	}
+
+	// (got != nil && want != nil) == true
+
+	if m.TimeStamp.Time.Nanosecond() != other.TimeStamp.Time.Nanosecond() {
+		t = fmt.Sprintf("\t\tGot TimeStamp.Time: %s,\n\t\tWant TimeStamp.Time: %s",
+			m.TimeStamp.Time.String(),
+			other.TimeStamp.Time.String())
+		s = append(s, t)
+	}
+
+	if strings.Compare(m.Gps.FixMode.String(), other.Gps.FixMode.String()) != 0 {
+		t = fmt.Sprintf("\t\tGot FixMode: %s,\n\t\tWant FixMode: %s",
+			m.Gps.FixMode.String(), other.Gps.FixMode.String())
+		s = append(s, t)
+	}
+
+	if a, b, ok := IsSameFloat64(m.Gps.Lat(), other.Gps.Lat(), m.FloatPrecision); !ok {
+		t = fmt.Sprintf("\t\tGot Latitude: %s,\n\t\tWant Latitude: %s", a, b)
+		s = append(s, t)
+	}
+
+	if a, b, ok := IsSameFloat64(m.Gps.Lon(), other.Gps.Lon(), m.FloatPrecision); !ok {
+		t = fmt.Sprintf("\t\tGot Longitude: %s,\n\t\tWant Longitude: %s", a, b)
+		s = append(s, t)
+	}
+
+	if a, b, ok := IsSameFloat64(m.Gps.Alt(), other.Gps.Alt(), m.FloatPrecision); !ok {
+		t = fmt.Sprintf("\t\tGot Altitude: %s,\n\t\tWant Altitude: %s", a, b)
+		s = append(s, t)
+	}
+
+	if len(s) > 0 {
+		return s, false
+	}
+	return s, true
 }
 
 //MarshalBinary marshals the struct fields from type Message into a

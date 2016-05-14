@@ -2,20 +2,20 @@ PASS
 BenchmarkGpsLat-6                        	2000000000	         0.75 ns/op
 BenchmarkGpsLon-6                        	2000000000	         0.75 ns/op
 BenchmarkGpsAlt-6                        	2000000000	         0.75 ns/op
-BenchmarkGpsSetLat-6                     	2000000000	         0.75 ns/op
-BenchmarkGpsSetLon-6                     	2000000000	         0.76 ns/op
+BenchmarkGpsSetLat-6                     	2000000000	         0.76 ns/op
+BenchmarkGpsSetLon-6                     	2000000000	         0.75 ns/op
 BenchmarkGpsSetAlt-6                     	2000000000	         0.75 ns/op
 BenchmarkMiscFloat32MarshalBinary-6      	300000000	         5.87 ns/op
 BenchmarkMiscFloat32MarshalBinaryValues-6	300000000	         5.89 ns/op
-BenchmarkMiscFloat32UnmarshalBinary-6    	1000000000	         2.69 ns/op
-BenchmarkPayloadCreateHMAC-6             	   30000	     49194 ns/op
-BenchmarkPayloadCheckHMAC-6              	   30000	     48985 ns/op
-BenchmarkPayloadInit-6                   	  300000	      5461 ns/op
-BenchmarkPayloadNew-6                    	  200000	      5538 ns/op
-BenchmarkPayloadMarshalBinary-6          	   30000	     44881 ns/op
-BenchmarkPayloadUnmarshalBinary-6        	  500000	      4140 ns/op
-BenchmarkTimeStampMarshalJSON-6          	 3000000	       587 ns/op
-BenchmarkTimeStampUnmarshalJSON-6        	 3000000	       514 ns/op
+BenchmarkMiscFloat32UnmarshalBinary-6    	1000000000	         2.70 ns/op
+BenchmarkPayloadCreateHMAC-6             	   30000	     47889 ns/op
+BenchmarkPayloadCheckHMAC-6              	   30000	     48117 ns/op
+BenchmarkPayloadInit-6                   	  500000	      4736 ns/op
+BenchmarkPayloadNew-6                    	  300000	      4872 ns/op
+BenchmarkPayloadMarshalBinary-6          	   30000	     44567 ns/op
+BenchmarkPayloadUnmarshalBinary-6        	  300000	      4142 ns/op
+BenchmarkTimeStampMarshalJSON-6          	 3000000	       569 ns/op
+BenchmarkTimeStampUnmarshalJSON-6        	 3000000	       545 ns/op
 BenchmarkTimeStampMarshalBytes-6         	100000000	        23.2 ns/op
-BenchmarkTimeStampUnmarshalBytes-6       	100000000	        20.6 ns/op
-ok  	github.com/larsth/go-rmsggpsbinmsg	36.762s
+BenchmarkTimeStampUnmarshalBytes-6       	100000000	        20.4 ns/op
+ok  	github.com/larsth/go-rmsggpsbinmsg	36.929s
