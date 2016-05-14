@@ -6,11 +6,11 @@ github.com/larsth/go-rmsggpsbinmsg/gps.go:39:		SetLat				100.0%
 github.com/larsth/go-rmsggpsbinmsg/gps.go:45:		SetLon				100.0%
 github.com/larsth/go-rmsggpsbinmsg/init.go:14:		init				100.0%
 github.com/larsth/go-rmsggpsbinmsg/init.go:18:		initBinMsg			100.0%
-github.com/larsth/go-rmsggpsbinmsg/message.go:24:	IsSameFloat64			0.0%
-github.com/larsth/go-rmsggpsbinmsg/message.go:31:	IsEqual				0.0%
-github.com/larsth/go-rmsggpsbinmsg/message.go:90:	MarshalBinary			0.0%
-github.com/larsth/go-rmsggpsbinmsg/message.go:149:	UnmarshalBinary			0.0%
-github.com/larsth/go-rmsggpsbinmsg/message.go:191:	Strings				0.0%
+github.com/larsth/go-rmsggpsbinmsg/message.go:23:	IsSameFloat64			0.0%
+github.com/larsth/go-rmsggpsbinmsg/message.go:30:	IsEqual				0.0%
+github.com/larsth/go-rmsggpsbinmsg/message.go:89:	MarshalBinary			0.0%
+github.com/larsth/go-rmsggpsbinmsg/message.go:148:	UnmarshalBinary			0.0%
+github.com/larsth/go-rmsggpsbinmsg/message.go:190:	Strings				0.0%
 github.com/larsth/go-rmsggpsbinmsg/misc.go:8:		float32MarshalBinary		100.0%
 github.com/larsth/go-rmsggpsbinmsg/misc.go:15:		float32MarshalBinaryValues	100.0%
 github.com/larsth/go-rmsggpsbinmsg/misc.go:20:		float32UnmarshalBinary		100.0%

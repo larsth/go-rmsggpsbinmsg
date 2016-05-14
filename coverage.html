@@ -183,8 +183,7 @@ type Message struct {
         //TimeStamp octets: timeStampOctets(=8) bytes (type time.Duration is an int64 value)
         TimeStamp TimeStamp `json:"timestamp"`
         //Gps octets: gpsOctet bytes
-        Gps            Gps `json:"gps"`
-        FloatPrecision int `json:"-"`
+        Gps Gps `json:"gps"`
 }
 
 func IsSameFloat64(a, b float64, precision int) (aTxt string, bTxt string, ok bool) <span class="cov0" title="0">{
@@ -194,53 +193,53 @@ func IsSameFloat64(a, b float64, precision int) (aTxt string, bTxt string, ok bo
         return
 }</span>
 
-func (m *Message) IsEqual(other *Message) (s []string, ok bool) <span class="cov0" title="0">{
+func IsEqual(got, want *Message, precision int) (s []string, ok bool) <span class="cov0" title="0">{
         var t string
 
-        if m == nil &amp;&amp; other == nil </span><span class="cov0" title="0">{
+        if got == nil &amp;&amp; want == nil </span><span class="cov0" title="0">{
                 return nil, false
         }</span>
 
         <span class="cov0" title="0">s = make([]string, 0, 16)
 
-        if m == nil &amp;&amp; other != nil </span><span class="cov0" title="0">{
-                t = fmt.Sprintf("\t\tGot: &lt;nil&gt;,\n\t\tWant: '%#v'", other)
+        if got == nil &amp;&amp; want != nil </span><span class="cov0" title="0">{
+                t = fmt.Sprintf("\t\tGot: &lt;nil&gt;,\n\t\tWant: '%#v'", want)
                 s = append(s, t)
                 return s, false
         }</span>
 
-        <span class="cov0" title="0">if m != nil &amp;&amp; other == nil </span><span class="cov0" title="0">{
-                t = fmt.Sprintf("\t\tGot: '%#v',\n\t\tWant: &lt;nil&gt;", m)
+        <span class="cov0" title="0">if got != nil &amp;&amp; want == nil </span><span class="cov0" title="0">{
+                t = fmt.Sprintf("\t\tGot: '%#v',\n\t\tWant: &lt;nil&gt;", got)
                 s = append(s, t)
                 return s, false
         }</span>
 
         // (got != nil &amp;&amp; want != nil) == true
 
-        <span class="cov0" title="0">if m.TimeStamp.Time.Nanosecond() != other.TimeStamp.Time.Nanosecond() </span><span class="cov0" title="0">{
+        <span class="cov0" title="0">if got.TimeStamp.Time.Nanosecond() != want.TimeStamp.Time.Nanosecond() </span><span class="cov0" title="0">{
                 t = fmt.Sprintf("\t\tGot TimeStamp.Time: %s,\n\t\tWant TimeStamp.Time: %s",
-                        m.TimeStamp.Time.String(),
-                        other.TimeStamp.Time.String())
+                        got.TimeStamp.Time.String(),
+                        want.TimeStamp.Time.String())
                 s = append(s, t)
         }</span>
 
-        <span class="cov0" title="0">if strings.Compare(m.Gps.FixMode.String(), other.Gps.FixMode.String()) != 0 </span><span class="cov0" title="0">{
+        <span class="cov0" title="0">if strings.Compare(got.Gps.FixMode.String(), want.Gps.FixMode.String()) != 0 </span><span class="cov0" title="0">{
                 t = fmt.Sprintf("\t\tGot FixMode: %s,\n\t\tWant FixMode: %s",
-                        m.Gps.FixMode.String(), other.Gps.FixMode.String())
+                        got.Gps.FixMode.String(), want.Gps.FixMode.String())
                 s = append(s, t)
         }</span>
 
-        <span class="cov0" title="0">if a, b, ok := IsSameFloat64(m.Gps.Lat(), other.Gps.Lat(), m.FloatPrecision); !ok </span><span class="cov0" title="0">{
+        <span class="cov0" title="0">if a, b, ok := IsSameFloat64(got.Gps.Lat(), want.Gps.Lat(), precision); !ok </span><span class="cov0" title="0">{
                 t = fmt.Sprintf("\t\tGot Latitude: %s,\n\t\tWant Latitude: %s", a, b)
                 s = append(s, t)
         }</span>
 
-        <span class="cov0" title="0">if a, b, ok := IsSameFloat64(m.Gps.Lon(), other.Gps.Lon(), m.FloatPrecision); !ok </span><span class="cov0" title="0">{
+        <span class="cov0" title="0">if a, b, ok := IsSameFloat64(got.Gps.Lon(), want.Gps.Lon(), precision); !ok </span><span class="cov0" title="0">{
                 t = fmt.Sprintf("\t\tGot Longitude: %s,\n\t\tWant Longitude: %s", a, b)
                 s = append(s, t)
         }</span>
 
-        <span class="cov0" title="0">if a, b, ok := IsSameFloat64(m.Gps.Alt(), other.Gps.Alt(), m.FloatPrecision); !ok </span><span class="cov0" title="0">{
+        <span class="cov0" title="0">if a, b, ok := IsSameFloat64(got.Gps.Alt(), want.Gps.Alt(), precision); !ok </span><span class="cov0" title="0">{
                 t = fmt.Sprintf("\t\tGot Altitude: %s,\n\t\tWant Altitude: %s", a, b)
                 s = append(s, t)
         }</span>
